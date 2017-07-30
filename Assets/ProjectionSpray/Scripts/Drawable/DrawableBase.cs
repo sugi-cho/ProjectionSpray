@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-using sugi.cc;
-
-public abstract class DrawableBase : RendererBehaviour {
-
+public abstract class DrawableBase : MonoBehaviour {
+    new protected Renderer renderer;
     public static List<DrawableBase> AllDrawableList { get; private set; }
     const string PropCanvasTex = "_Canvas";
     const string PropGuidTex = "_Guid";
@@ -37,24 +35,33 @@ public abstract class DrawableBase : RendererBehaviour {
 
     private void Start()
     {
-        SettingManager.AddSettingMenu(setting, string.Format("DrawableObjectSettings/{0}.json", name));
+        renderer = GetComponent<Renderer>();
         Init();
     }
 
+    RenderTexture CreateRT()
+    {
+        var rt = new RenderTexture(setting.texWidth, setting.texHeight, 0, RenderTextureFormat.ARGBHalf);
+        rt.Create();
+        return rt;
+    }
     protected virtual void Init ()
     {
-        canvas = Helper.CreateRenderTexture(setting.texWidth, setting.texHeight);
+        canvas = CreateRT();
         canvas.wrapMode = TextureWrapMode.Clamp;
         guid = Instantiate(canvas);
         guid.Create();
 
-        pingPongCanvasRts = Helper.CreateRts(canvas, pingPongCanvasRts);
-        pingPongGuidRts = Helper.CreateRts(guid, pingPongGuidRts);
+        pingPongCanvasRts = new[] { CreateRT(), CreateRT() };
+        pingPongGuidRts = new[] { CreateRT(), CreateRT() };
 
         Clear();
 
-        renderer.SetTexture(PropCanvasTex, canvas);
-        renderer.SetTexture(PropGuidTex, guid);
+        var mpb = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(mpb);
+        mpb.SetTexture(PropCanvasTex, canvas);
+        mpb.SetTexture(PropGuidTex, guid);
+        renderer.SetPropertyBlock(mpb);
     }
     public void Clear()
     {
@@ -95,7 +102,7 @@ public abstract class DrawableBase : RendererBehaviour {
     protected virtual void UpdateTexture(RenderTexture[] pingPongCanvasRts, RenderTexture[] pingPongGuidRts) { }
 
     [System.Serializable]
-    public class Setting : SettingManager.Setting
+    public class Setting 
     {
         public int texWidth = 1024;
         public int texHeight = 1024;

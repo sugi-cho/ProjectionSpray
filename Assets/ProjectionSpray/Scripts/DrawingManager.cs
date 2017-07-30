@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using sugi.cc;
 
-public class DrawingManager : SingletonMonoBehaviour<DrawingManager>
+public class DrawingManager : MonoBehaviour
 {
 
     DrawerBase drawer;

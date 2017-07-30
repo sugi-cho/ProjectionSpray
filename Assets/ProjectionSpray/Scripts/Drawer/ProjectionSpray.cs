@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-using sugi.cc;
-
 
 public class ProjectionSpray : DrawerBase
 {
@@ -16,7 +14,9 @@ public class ProjectionSpray : DrawerBase
                     _cam = gameObject.AddComponent<Camera>();
                 _cam.clearFlags = CameraClearFlags.Nothing;
                 _cam.nearClipPlane = 0.01f;
-                _cam.targetTexture = depthOutput = Helper.CreateRenderTexture(dpthResolution, dpthResolution, depthOutput, RenderTextureFormat.RFloat);
+                depthOutput = new RenderTexture(dpthResolution, dpthResolution, 0, RenderTextureFormat.RFloat);
+                depthOutput.Create();
+                _cam.targetTexture = depthOutput;
                 _cam.SetReplacementShader(depthRendererShader, "RenderType");
             }
             return _cam;

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using sugi.cc;
 
 public abstract class DrawerBase : MonoBehaviour
 {
@@ -67,8 +66,15 @@ public abstract class DrawerBase : MonoBehaviour
         if (pass < drawMat.passCount)
         {
             Graphics.Blit(rts[0], rts[1], drawMat, pass);
-            rts.Swap();
+            Swap(rts);
         }
+    }
+
+    void Swap(RenderTexture[] rts)
+    {
+        var tmp = rts[0];
+        rts[0] = rts[1];
+        rts[1] = tmp;
     }
 
     public void SetDrawerTransform()
