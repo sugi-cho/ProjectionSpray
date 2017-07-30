@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 999e53f0add9c97459699955dd5a1921
+timeCreated: 1500454055
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - copyRGB: {fileID: 2100000, guid: bfeb1d19318113940b735bf7e6c9163c, type: 2}
+  - originTex: {instanceID: 0}
+  - mesh: {instanceID: 0}
+  - positionInfoTex: {instanceID: 0}
+  - normalInfoTex: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
