@@ -1,10 +1,9 @@
-﻿Shader "Hidden/Projectionspray"
+﻿Shader "Hidden/BombPainter"
 {
 	Properties
 	{
 		_MainTex ("canvas", 2D) = "white" {}
-		_Shape ("splay shape", 2D) = "black"{}
-		_Depth ("projecor depth", 2D) = "black"{}
+		_Depth ("projecor depth", Cube) = "black"{}
 		
 		_OPosTex ("object position", 2D) = "black"{}
 		_ONormTex ("object normal", 2D) = "black"{}
@@ -37,10 +36,12 @@
 			o.uv = v.uv;
 			return o;
 		}
-			
-		sampler2D _MainTex, _Shape, _OPosTex, _ONormTex, _Depth;
-		float4x4 _ProjectionMatrix, _MatrixO2W, _MatrixW2D;
-		half4 _Color;
+		
+		samplerCUBE _Depth;
+		sampler2D _MainTex, _Shape, _OPosTex, _ONormTex;
+		float4x4 _MatrixO2W;
+		half4 _Color, _Rot;
+		half3 _Pos;
 		half _Emission, _Dst;
 
 		void getObjectPos(float2 uv, inout half3 wPos, inout half3 wNorm){
@@ -51,45 +52,39 @@
 			wPos -= (pos.a < 0.5) * 10000;
 		}
 
-		float calcAtten(float3 vPos, float3 vNorm, inout float depth){
-			depth = length(vPos);
-			float3 dir = normalize(vPos);
-			float atten = max(0, dot(vNorm, -dir));
+		float calcAtten(float3 to, float3 wNorm){
+			float3 dir = normalize(to);
+			float atten = max(0, dot(wNorm, -dir));
 			return atten;
 		}
 
-		//MatrixW2D: world to drawer matrix.
-		half4 projectedTex(half3 wPos, half3 wNorm)
+		half projectedVal(half3 wPos, half3 wNorm)
 		{
-			float4 uvProj = mul(_ProjectionMatrix, float4(wPos,1));
-			half2 uv = uvProj.xy/uvProj.w;
+			float3 to = wPos - _Pos;
+			float depth = length(to);
+			float depthMask = texCUBE(_Depth, normalize(to)).r;
+			float atten = calcAtten(to, wNorm);
 
-			half4 tex = tex2Dlod (_Shape, half4(uv,0,0));
+			half val = 1.0;
 
-			float3 vPos = mul(_MatrixW2D, float4(wPos,1)).xyz;
-			float3 vNorm = mul((float3x3)_MatrixW2D, wNorm);
-			float depth;
-			float depthMask = tex2Dlod(_Depth, half4(uv,0,0)).r;
-			float atten = calcAtten(vPos, vNorm, depth);
+			val *= 1.0 - saturate(( depth - depthMask)*100.0);
+			val *= atten;
+			val *= lerp(1, 0, saturate(depth/_Dst));
 
-			tex.a *= 0 < uvProj.z;
-			tex.a *= (abs(uv.x-0.5)<0.5) * (abs(uv.y-0.5)<0.5);
-			tex.a *= 1.0 - saturate(( depth - depthMask)*100.0);
-			tex.a *= atten;
-			tex.a *= lerp(1, 0, (depth/_Dst));
-
-			return tex;
+			return val;
 		}
 
 		half4 draw (v2f i) : SV_Target
 		{
-			fixed4 col = tex2D(_MainTex, i.uv);
+			fixed4 col0 = tex2D(_MainTex, i.uv);
 			half3 wPos, wNorm;
 			getObjectPos(i.uv, wPos, wNorm);
-			half4 tex = projectedTex(wPos, wNorm) * _Color;
-			tex.a *= unity_DeltaTime * _Emission;
 
-			col.rgb = lerp(col.rgb, tex.rgb, tex.a);
+			half4 col1 = _Color;
+			col1.a *= projectedVal(wPos, wNorm);
+			col1.a *= unity_DeltaTime * _Emission;
+
+			half4 col =lerp(col0, col1, col1.a);
 			col.a = 1;
 			
 			return col;
@@ -97,13 +92,15 @@
 
 		half4 drawGuid(v2f i) : SV_Target
 		{
-			fixed4 col = tex2D(_MainTex, i.uv);
+			fixed4 col0 = tex2D(_MainTex, i.uv);
 			half3 wPos, wNorm;
 			getObjectPos(i.uv, wPos, wNorm);
-			half4 tex = projectedTex(wPos, wNorm) * _Color;
 
-			col = lerp(col, tex, tex.a);
-			col.a = tex.a;
+			half4 col1 = _Color;
+			col1.a *= projectedVal(wPos, wNorm);
+			
+			half4 col =lerp(col0, col1, col1.a);
+			col.a = col1.a;
 			
 			return col;
 		}

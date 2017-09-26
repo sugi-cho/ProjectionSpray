@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using sugi.cc;
 
@@ -6,13 +7,11 @@ public class DrawingManager : SingletonMonoBehaviour<DrawingManager>
 {
 
     DrawerBase drawer;
-    DrawableBase[] drawables;
 
     // Use this for initialization
     void Start()
     {
         drawer = FindObjectOfType<DrawerBase>();
-        drawables = FindObjectsOfType<DrawableBase>();
     }
 
     // Update is called once per frame
@@ -28,15 +27,14 @@ public class DrawingManager : SingletonMonoBehaviour<DrawingManager>
         }
 
         drawer.drawing = Input.GetMouseButton(0);
-
-
-        foreach (var drawable in drawables)
+        
+        foreach (var drawable in DrawableBase.ReadyToDraws)
             drawable.ClearGuid();
-
+        
         drawer.Draw();
         drawer.DrawGuid();
 
-        foreach (var drawable in drawables)
+        foreach (var drawable in DrawableBase.ReadyToDraws)
             drawable.Apply();
     }
 
@@ -49,7 +47,7 @@ public class DrawingManager : SingletonMonoBehaviour<DrawingManager>
         GUI.backgroundColor = Color.gray;
         for (var i = 0; i < 2; i++)
         {
-            var co = (CanvasObject)drawables[i];
+            var co = (CanvasObject)DrawableBase.ReadyToDraws.ElementAt(i);
             rect.x = (Screen.width - width) * i;
 
             GUILayout.BeginArea(rect, (GUIStyle)"box");

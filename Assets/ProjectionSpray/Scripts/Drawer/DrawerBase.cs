@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using sugi.cc;
 
@@ -18,7 +19,7 @@ public abstract class DrawerBase : MonoBehaviour
     public Color color;
     public float emission = 0f;
     public bool drawing;
-    
+
 
     public List<DrawableBase> drawTargetList
     {
@@ -38,12 +39,19 @@ public abstract class DrawerBase : MonoBehaviour
     protected virtual void UpdateDrawTarget()
     {
         drawTargetList.Clear();
-        drawTargetList.AddRange(DrawableBase.AllDrawableList);
+        drawTargetList.AddRange(DrawableBase.ReadyToDraws);
+    }
+
+    protected virtual void UpdateDrawerProp()
+    {
+        drawMat.SetColor(PropColor, color);
+        drawMat.SetFloat(PropEmission, emission);
     }
 
     public void Draw()
     {
         UpdateDrawTarget();
+        UpdateDrawerProp();
         if (!drawing) return;
         foreach (var d in drawTargetList)
             DrawTo(d);
@@ -61,8 +69,6 @@ public abstract class DrawerBase : MonoBehaviour
 
     public virtual void DrawRts(RenderTexture[] rts, int pass)
     {
-        drawMat.SetColor(PropColor, color);
-        drawMat.SetFloat(PropEmission, emission);
 
         if (pass < drawMat.passCount)
         {

@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using sugi.cc;
 
-public abstract class DrawableBase : RendererBehaviour {
+public abstract class DrawableBase : RendererBehaviour
+{
 
-    public static List<DrawableBase> AllDrawableList { get; private set; }
+    static List<DrawableBase> AllDrawableList;
+    public static IEnumerable<DrawableBase> ReadyToDraws { get { return AllDrawableList.Where(d => d.initialized); } }
+
     const string PropCanvasTex = "_Canvas";
     const string PropGuidTex = "_Guid";
 
     public Setting setting;
-    public Color clearColor = Color.gray;
+    public Color clearColor = Color.black;
     public Texture originTex;
 
     public Material updater;
@@ -23,6 +27,7 @@ public abstract class DrawableBase : RendererBehaviour {
     RenderTexture[] pingPongGuidRts;
 
     public Texture drawingTex { get { return canvas; } }
+    public bool initialized { get; private set; }
 
     private void OnEnable()
     {
@@ -37,11 +42,13 @@ public abstract class DrawableBase : RendererBehaviour {
 
     private void Start()
     {
+        if (setting == null)
+            setting = new Setting();
         SettingManager.AddSettingMenu(setting, string.Format("DrawableObjectSettings/{0}.json", name));
         Init();
     }
 
-    protected virtual void Init ()
+    protected virtual void Init()
     {
         canvas = Helper.CreateRenderTexture(setting.texWidth, setting.texHeight);
         canvas.wrapMode = TextureWrapMode.Clamp;
@@ -55,6 +62,7 @@ public abstract class DrawableBase : RendererBehaviour {
 
         renderer.SetTexture(PropCanvasTex, canvas);
         renderer.SetTexture(PropGuidTex, guid);
+        initialized = true;
     }
     public void Clear()
     {
@@ -97,7 +105,7 @@ public abstract class DrawableBase : RendererBehaviour {
     [System.Serializable]
     public class Setting : SettingManager.Setting
     {
-        public int texWidth = 1024;
-        public int texHeight = 1024;
+        public int texWidth = 512;
+        public int texHeight = 512;
     }
 }

@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Hidden_ProjectionSpray
-  m_Shader: {fileID: 4800000, guid: 08d73e22ea031ee44bd4b895ebea2afb, type: 3}
+  m_Name: Hidden_BombPainter
+  m_Shader: {fileID: 4800000, guid: aff0d6640a848834fb9baae3d209cf60, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -35,15 +35,13 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Shape:
-        m_Texture: {fileID: 28837447761748006, guid: 0da00a855726f164dba35cd0434636f1,
-          type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Dst: 30
+    - _Dst: 10
     - _Emission: 1
-    - _Eps: 0
     m_Colors:
-    - _Color: {r: 1, g: 0, b: 0.21182632, a: 1}
-    - _Pos: {r: -4, g: 8, b: -8, a: 0}
-    - _Rot: {r: 0.24968478, g: 0.2708999, b: -0.07298243, a: 0.9267925}
+    - _Color: {r: 1, g: 0, b: 0.58800507, a: 1}
+    - _Pos: {r: 1.5, g: 2, b: 1.5, a: 0}
+    - _Rot: {r: -0.0051130224, g: 0.9768306, b: 0.023486117, a: 0.21265997}
