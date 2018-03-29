@@ -1,5 +1,7 @@
 # ProjectionSpray
 
+I think [this](https://github.com/sugi-cho/Unity-ProjectionSpray-v2) is better one.
+
 Draw spray to 3D model with Unity.
 
 ![](Imgs/capture.gif)
